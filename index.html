@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabajo Geografía & Juego de Cartas</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Iconos Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Fuentes: Inter (Trabajo) y Orbitron (Juego) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
@@ -285,7 +282,6 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
-    <!-- 1. INTRODUCCIÓN -->
     <div id="intro-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000">
         <div class="text-center animate-pulse px-4">
             <h1 class="text-3xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">BIENVENIDOS</h1>
@@ -295,7 +291,6 @@
         </div>
     </div>
 
-    <!-- 2. PORTADA -->
     <div id="cover-screen" class="hidden-section fixed inset-0 z-40 flex flex-col items-center justify-center bg-[#0d1117] bg-[url('https://images.unsplash.com/photo-1625246333195-5848c4282ee8?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
         <div class="relative z-10 text-center max-w-3xl px-6 fade-in">
@@ -306,7 +301,6 @@
         </div>
     </div>
 
-    <!-- 3. MENÚ PRINCIPAL (HUB) -->
     <div id="hub-screen" class="hidden-section min-h-screen flex flex-col items-center justify-center p-6 relative">
         <div class="text-center mb-12 fade-in">
             <h2 class="text-3xl font-bold text-white mb-2">Selecciona un Área</h2>
@@ -314,7 +308,6 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full fade-in">
             
-            <!-- TARJETA 1: TRABAJO (Geografía) -> Lleva al Sub-Hub -->
             <div onclick="enterGeoSubHub()" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-[#1f7d54]">
                 <div class="w-20 h-20 rounded-full bg-blue-900/30 flex items-center justify-center mb-6">
                     <i data-lucide="book-open" class="w-10 h-10 text-blue-400"></i>
@@ -323,7 +316,6 @@
                 <p class="text-sm text-gray-400">Contenido del Sector Primario.</p>
             </div>
 
-            <!-- TARJETA 2: EXAMEN (Nuevo) -->
             <div onclick="enterExam()" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-red-500">
                 <div class="w-20 h-20 rounded-full bg-red-900/30 flex items-center justify-center mb-6">
                     <i data-lucide="graduation-cap" class="w-10 h-10 text-red-400"></i>
@@ -332,7 +324,6 @@
                 <p class="text-sm text-gray-400">Demuestra lo que has aprendido.</p>
             </div>
 
-            <!-- TARJETA 3: JUEGO (Juego de Cartas) -->
             <div onclick="enterGame()" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-[#ff00ff]">
                 <div class="w-20 h-20 rounded-full bg-purple-900/30 flex items-center justify-center mb-6">
                     <i data-lucide="gamepad-2" class="w-10 h-10 text-[#ff00ff]"></i>
@@ -343,7 +334,6 @@
         </div>
     </div>
 
-    <!-- 4. SUB-HUB GEOGRAFÍA (MENÚ DE 3 TARJETAS) -->
     <div id="geo-sub-hub" class="hidden-section min-h-screen flex flex-col items-center justify-center p-6 relative bg-[#0d1117]">
         <button onclick="backToHubFromSub()" class="absolute top-6 left-6 text-white bg-[#21262d] px-4 py-2 rounded-lg border border-[#30363d] flex items-center gap-2 hover:bg-[#30363d]">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
@@ -356,7 +346,6 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full fade-in">
             
-            <!-- TARJETA A: FUNDAMENTOS -->
             <div onclick="renderGeoGroup('fundamentos')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-green-400">
                 <div class="w-20 h-20 rounded-full bg-green-900/30 flex items-center justify-center mb-6">
                     <i data-lucide="sprout" class="w-10 h-10 text-green-400"></i>
@@ -365,7 +354,6 @@
                 <p class="text-sm text-gray-400">Definiciones, Agricultura, Ganadería, Pesca y Silvicultura.</p>
             </div>
 
-            <!-- TARJETA B: PROBLEMAS -->
             <div onclick="renderGeoGroup('problemas')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-yellow-400">
                 <div class="w-20 h-20 rounded-full bg-yellow-900/30 flex items-center justify-center mb-6">
                     <i data-lucide="alert-triangle" class="w-10 h-10 text-yellow-400"></i>
@@ -374,7 +362,6 @@
                 <p class="text-sm text-gray-400">España, Impacto ambiental, retos y características económicas.</p>
             </div>
 
-            <!-- TARJETA C: HISTORIA -->
             <div onclick="renderGeoGroup('historia')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-blue-400">
                 <div class="w-20 h-20 rounded-full bg-blue-900/30 flex items-center justify-center mb-6">
                     <i data-lucide="scroll" class="w-10 h-10 text-blue-400"></i>
@@ -382,14 +369,18 @@
                 <h3 class="text-2xl font-bold text-white mb-2">Evolución y Desigualdades</h3>
                 <p class="text-sm text-gray-400">Historia y diferencias Norte-Sur.</p>
             </div>
-
+            <div onclick="renderGeoGroup('secundario')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-sky-400">
+                <div class="w-20 h-20 rounded-full bg-sky-900/30 flex items-center justify-center mb-6">
+                    <i data-lucide="factory" class="w-10 h-10 text-sky-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Sector Secundario</h3>
+                <p class="text-sm text-gray-400">Industria, Energía y Construcción.</p>
+            </div>
         </div>
     </div>
 
-    <!-- 5. VISOR DE CONTENIDO GEOGRAFÍA (CON FONDO ANIMADO) -->
     <div id="geo-content-screen" class="hidden-section min-h-screen flex flex-col bg-transparent relative p-4 md:p-8">
         
-        <!-- FONDO ANIMADO -->
         <div class="fondo-sector-primario">
             <div class="sol"></div>
             <div class="nube nube1"></div>
@@ -402,21 +393,17 @@
         </button>
         
         <main class="max-w-4xl mx-auto w-full mt-12 fade-in relative z-10">
-            <!-- Fondo del contenedor semi-transparente para leer sobre el paisaje -->
             <div id="geo-dynamic-content" class="bg-[#161b22]/95 p-8 rounded-2xl border border-[#30363d] shadow-2xl backdrop-blur-sm">
-                <!-- Aquí se carga el contenido largo -->
-            </div>
+                </div>
         </main>
     </div>
 
-    <!-- 6. PANTALLA DE EXAMEN -->
     <div id="exam-screen" class="hidden-section min-h-screen flex flex-col bg-[#0d1117] items-center justify-center p-4">
         <div class="w-full max-w-2xl bg-[#161b22] border border-[#30363d] rounded-2xl p-6 md:p-8 shadow-2xl relative">
             <button onclick="backToHubFromExam()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
 
-            <!-- Pantalla Inicio Examen -->
             <div id="exam-start-view" class="text-center">
                 <div class="w-20 h-20 rounded-full bg-red-900/30 flex items-center justify-center mx-auto mb-6">
                     <i data-lucide="file-check" class="w-10 h-10 text-red-400"></i>
@@ -432,7 +419,6 @@
                 </button>
             </div>
 
-            <!-- Pantalla Pregunta -->
             <div id="exam-question-view" class="hidden-section">
                 <div class="flex justify-between items-center mb-6">
                     <span class="text-sm font-mono text-gray-400">Pregunta <span id="current-q-num">1</span>/25</span>
@@ -442,8 +428,7 @@
                 <h3 id="question-text" class="text-xl md:text-2xl font-bold text-white mb-8"></h3>
                 
                 <div id="options-container" class="space-y-3">
-                    <!-- Botones de opciones se inyectan aquí -->
-                </div>
+                    </div>
                 
                 <div id="feedback-msg" class="mt-4 text-center font-bold min-h-[4rem]"></div>
 
@@ -452,7 +437,6 @@
                 </button>
             </div>
 
-            <!-- Pantalla Resultados -->
             <div id="exam-result-view" class="hidden-section text-center">
                 <h2 class="text-3xl font-bold text-white mb-2">¡Examen Finalizado!</h2>
                 <p class="text-gray-400 mb-6">Resultados finales</p>
@@ -468,7 +452,6 @@
         </div>
     </div>
 
-    <!-- 7. PANTALLA DEL JUEGO (JUEGO DE CARTAS) -->
     <div id="game-screen" class="hidden-section">
         <button onclick="backToHubFromGame()" class="exit-game-btn">SALIR DEL JUEGO</button>
         
@@ -694,7 +677,6 @@
                     </p>
                     
                     <div class="space-y-8">
-                        <!-- Hito 1: Neolítico -->
                         <div class="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
                             <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">La Gran Transición: El Neolítico (Hace 10.000 años)</h3>
                             <p class="text-gray-400">
@@ -702,7 +684,6 @@
                             </p>
                         </div>
 
-                        <!-- Hito 2: Edad Media -->
                         <div class="bg-[#21262d] p-6 rounded-xl border border-[#30363d]">
                             <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">Agricultura de Supervivencia: La Edad Media</h3>
                             <p class="text-gray-400">
@@ -710,7 +691,6 @@
                             </p>
                         </div>
 
-                        <!-- Hito 3: Revolución Agrícola -->
                         <div class="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
                             <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">La Gran Productividad: Revolución Agrícola (Siglo XVIII)</h3>
                             <p class="text-gray-400">
@@ -719,7 +699,6 @@
                             
                         </div>
 
-                        <!-- Hito 4: Revolución Verde y Biotecnología -->
                         <div class="bg-[#21262d] p-6 rounded-xl border border-[#30363d]">
                             <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">La Era Química: Revolución Verde (Mediados del S. XX)</h3>
                             <p class="text-gray-400">
@@ -727,7 +706,6 @@
                             </p>
                         </div>
 
-                        <!-- Hito 5: Globalización -->
                         <div class="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
                             <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">El Campo Globalizado: Actualidad</h3>
                             <p class="text-gray-400">
@@ -740,7 +718,6 @@
                 <div class="content-block">
                     <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-blue-500 pb-2">⚖️ DESIGUALDADES: NORTE VS SUR</h2>
                     <div class="grid md:grid-cols-3 gap-6"> 
-                        <!-- Developed -->
                         <div class="bg-[#21262d] p-6 rounded-xl border-t-4 border-blue-500 shadow-lg">
                             <h3 class="text-xl font-bold text-white mb-4">Países Desarrollados</h3>
                             <ul class="space-y-2 text-gray-400 text-sm">
@@ -749,7 +726,6 @@
                                 <li>• Menos del 5% población activa.</li>
                             </ul>
                         </div>
-                        <!-- Developing -->
                         <div class="bg-[#21262d] p-6 rounded-xl border-t-4 border-yellow-500 shadow-lg">
                             <h3 class="text-xl font-bold text-white mb-4">Países en Vías de Desarrollo</h3>
                             <ul class="space-y-2 text-gray-400 text-sm">
@@ -758,7 +734,6 @@
                                 <li>• Gran parte de la población en el campo.</li>
                             </ul>
                         </div>
-                        <!-- Third World / PMA -->
                         <div class="bg-[#21262d] p-6 rounded-xl border-t-4 border-red-500 shadow-lg">
                             <h3 class="text-xl font-bold text-white mb-4">Países Menos Adelantados (PMA)</h3>
                             <ul class="space-y-2 text-gray-400 text-sm">
@@ -770,8 +745,141 @@
                         </div>
                     </div>
                 </div>
-            `
-        };
+            `, // COMA AÑADIDA AQUÍ
+            secundario: `
+        <div class="content-block">
+            <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-sky-500 pb-2">🏭 SECTOR SECUNDARIO: Clasificación Industrial</h2>
+            
+            <div class="mb-8 p-4 bg-sky-900/20 border-l-4 border-sky-400 rounded-lg">
+                <h3 class="text-2xl font-bold text-sky-400 flex items-center mb-2"><i data-lucide="building" class="w-6 h-6 mr-2"></i> CLASIFICACIÓN INDUSTRIAL MODERNA</h3>
+                <p class="text-gray-300 italic mb-3">La industria se clasifica primordialmente según el destino del producto y la intensidad tecnológica y de capital requerida.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point">Criterio Base: Destino Final (Insumo vs. Consumo).</li>
+                    <li class="bullet-point">Factor Crítico: Inversión de Capital y Nivel de I+D (Investigación y Desarrollo).</li>
+                    <li class="bullet-point">Tendencia: Desplazamiento de la producción masiva a países en desarrollo.</li>
+                </ul>
+            </div>
+            
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">1. Industria Pesada (Base)</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">Definición: Transforma materias primas en productos semielaborados (p. ej., barras de metal, productos químicos) esenciales para el resto de la cadena industrial.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-green-400">Productos Típicos: Acero, Cementos especiales, Alúmina, Cloro.</li>
+                    <li class="bullet-point">Requerimientos: Uso intensivo de energía (electrolisis, hornos), enormes instalaciones y procesos continuos. Alto Capital Fijo.</li>
+                    <li class="bullet-point">Ubicación: Históricamente cerca de minas/carbón. Hoy, cerca de puertos o fuentes energéticas baratas (p. ej., hidroeléctricas).</li>
+                </ul>
+            </div>
+
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">2. Industria de Bienes de Equipo</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">**Definición:** Fabrica el instrumental y la infraestructura productiva (maquinaria, herramientas de precisión) necesaria para equipar otras fábricas.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-green-400">Productos Típicos: Turbinas, Chips de control industrial, Máquinas CNC, Líneas de montaje automatizadas.</li>
+                    <li class="bullet-point">Especialización: Requiere la mayor inversión en I+D (Investigación y Desarrollo) y personal altamente cualificado (ingenieros y técnicos).</li>
+                    <li class="bullet-point">Impacto: Es el motor de la modernización. Su rendimiento define la eficiencia tecnológica de un país.</li>
+                </ul>
+            </div>
+
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">3. Industria Ligera (Consumo)</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">**Definición:Genera bienes acabados y de uso directo, caracterizada por procesos flexibles que responden rápidamente a la demanda del mercado.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-green-400"Productos Típicos: Textil, Calzado, Alimentos procesados, Electrónica (smartphones, electrodomésticos).</li>
+                    <li class="bullet-point">Requerimientos: Más dependiente de la Mano de Obra (aunque cada vez más automatizada) y de la logística de distribución.</li>
+                    <li class="bullet-point">Ubicación: Típicamente cerca de grandes centros de consumo o en países con bajos salarios (por la deslocalización).</li>
+                </ul>
+            </div>
+
+            <h2 class="text-3xl font-extrabold text-white mb-6 mt-12 border-b border-yellow-500 pb-2">⚡ ENERGÍA: La Base del Desarrollo Industrial</h2>
+
+            <div class="mb-8 p-4 bg-yellow-900/20 border-l-4 border-yellow-400 rounded-lg">
+                <h3 class="text-2xl font-bold text-yellow-400 flex items-center mb-2"><i data-lucide="battery-charging" class="w-6 h-6 mr-2"></i> LA MATRIZ ENERGÉTICA GLOBAL</h3>
+                <p class="text-gray-300 italic mb-3">El consumo energético está directamente correlacionado con el nivel de industrialización y desarrollo de un país.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point">Dependencia Fósil: A pesar del auge renovable, el mundo sigue dependiendo en gran medida del petróleo y el gas.</li>
+                    <li class="bullet-point">Geopolítica: Los países productores de petróleo (OPEP) tienen un enorme poder e influencia global.</li>
+                    <li class="bullet-point">Transición: El desafío es asegurar el suministro para el crecimiento industrial mientras se descarboniza la economía.</li>
+                </ul>
+            </div>
+
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">1. Fuentes No Renovables (Finitas y Contaminantes)</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">Fuentes cuya velocidad de consumo supera la velocidad de su regeneración natural. Lideran la emisión de gases de efecto invernadero (GEI).</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-red-400">Carbón: Histórico motor de la I.R. Más contaminante, pero sigue siendo clave en países como China e India.</li>
+                    <li class="bullet-point text-red-400">Petróleo y Gas: Dominan el transporte y la industria química. Su volatilidad de precio afecta a toda la economía mundial.</li>
+                    <li class="bullet-point text-red-400">Nuclear: Controversial. Bajas emisiones de CO2 pero alto riesgo de accidentes y gestión de residuos radiactivos a largo plazo.</li>
+                </ul>
+            </div>
+            
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">2. Fuentes Renovables (Sostenibles e Inagotables)</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">Alternativas esenciales para un futuro sostenible. Su desafío principal es la estabilidad de la red (intermitencia).</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-green-400">Eólica y Solar: Lideran el crecimiento. Dependen de avances en sistemas de almacenamiento (baterías de Litio/Vanadio).</li>
+                    <li class="bullet-point text-green-400">Hidráulica: Fuente estable y madura, pero limitada geográficamente y con impactos ambientales locales (represas).</li>
+                    <li class="bullet-point text-green-400">Biomasa y Geotérmica: Usos más localizados. Aprovechan residuos orgánicos o el calor interno de la Tierra, respectivamente.</li>
+                </ul>
+            </div>
+
+            <h2 class="text-3xl font-extrabold text-white mb-6 mt-12 border-b border-red-500 pb-2">🌍 DESIGUALDADES Y GEOPOLÍTICA INDUSTRIAL</h2>
+            
+            <div class="mb-8 p-4 bg-red-900/20 border-l-4 border-red-400 rounded-lg">
+                <h3 class="text-2xl font-bold text-red-400 flex items-center mb-2"><i data-lucide="banknote" class="w-6 h-6 mr-2"></i> CONCENTRACIÓN DE PODER Y EL EJE NORTE-SUR</h3>
+                <p class="text-gray-300 italic mb-3">La distribución de la producción industrial consolida la división global: el Norte controla el capital y la tecnología; el Sur, la mano de obra y los recursos.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point">Norte Global (Ricos): Controlan la **Innovación** (I+D), la financiación, las patentes y las sedes centrales de las multinacionales.</li>
+                    <li class="bullet-point">Sur Global (Pobres): Suministran la **Mano de Obra Barata**, las materias primas y son los lugares de ensamblaje (la "fábrica" del mundo).</li>
+                    <li class="bullet-point">Resultado: Flujo de riqueza constante del Sur al Norte a través de los beneficios empresariales.</li>
+                </ul>
+            </div>
+            
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">1. Deslocalización y Empresas Multinacionales</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">Proceso: El traslado estratégico de procesos productivos (no de sedes) desde países desarrollados a países periféricos para reducir costes. </p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point">Factores de Atracción: Salarios mínimos, baja presión fiscal, legislación ambiental y laboral laxa (o inexistente).</li>
+                    <li class="bullet-point">Consecuencia (País Receptor): Creación de empleo precario, explotación laboral y fuerte dependencia de la empresa extranjera.</li>
+                    <li class="bullet-point">Consecuencia (País Emisor): Desindustrialización, aumento del paro en la industria y "tercerización" (dominio del sector servicios).</li>
+                </ul>
+            </div>
+            
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">2. Impacto Ambiental: La Deuda Ecológica</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">La producción industrial a gran escala exige un ritmo de consumo de recursos que la biosfera no puede sostener (sobreexplotación).</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point">Huella de Carbono: Emisiones directas de las fábricas, agravadas por el transporte global de productos (logística).</li>
+                    <li class="bullet-point">Contaminación Hídrica: Vertidos tóxicos de la industria química o textil en países con controles débiles.</li>
+                    <li class="bullet-point">Obsolescencia Programada: Estrategia de diseño para que los productos duren poco, forzando un ciclo de consumo y producción incesante.</li>
+                </ul>
+            </div>
+            
+            <h2 class="text-3xl font-extrabold text-white mb-6 mt-12 border-b border-purple-500 pb-2">🕰️ HISTORIA Y EVOLUCIÓN INDUSTRIAL (Las 4 Revoluciones)</h2>
+
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">El Camino a la Fábrica Inteligente</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">La industria ha pasado por cuatro grandes transformaciones, cada una marcada por una nueva fuente de energía o tecnología dominante.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-purple-400">I.R. 1.0 (Finales S. XVIII): Máquina de vapor. Mecanización textil y ferroviaria.</li>
+                    <li class="bullet-point text-purple-400">I.R. 2.0 (Finales S. XIX): Electricidad, petróleo. Producción en cadena (Taylorismo/Fordismo) y estandarización.</li>
+                    <li class="bullet-point text-purple-400">I.R. 3.0 (Década de 1970): Electrónica, Informática. Automatización simple (PLCs) y robots básicos.</li>
+                </ul>
+            </div>
+
+            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">La Industria 4.0: Ciber-Física</h4>
+            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
+                <p class="mb-3 text-sm text-gray-400">La cuarta revolución industrial une el mundo físico con el digital a través de sistemas ciber-físicos, permitiendo fábricas totalmente autónomas y adaptativas.</p>
+                <ul class="space-y-1 text-sm">
+                    <li class="bullet-point text-purple-400">Sistemas Clave: IoT (sensores en toda la cadena), Big Data (análisis masivo) e Inteligencia Artificial (toma de decisiones).</li>
+                    <li class="bullet-point">Personalización Masiva: La fábrica puede producir bienes únicos a la misma velocidad que produce masivamente.</li>
+                    <li class="bullet-point">Desafío Social: El aumento de la automatización genera un miedo real a la pérdida de empleos no cualificados, exigiendo una reestructuración de la fuerza laboral.</li>
+                </ul>
+            </div>
+        </div>
+    `
+};
+            
+        
 
         // --- PREGUNTAS DEL EXAMEN (25 TOTAL) ---
         const examQuestions = [
