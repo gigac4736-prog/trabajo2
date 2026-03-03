@@ -3,1272 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trabajo Geografía & Juego de Cartas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-    
+    <title>TERMINAL GHOST</title>
     <style>
-        /* --- ESTILOS GENERALES APP --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d1117; 
-            color: #c9d1d1;
-            overflow-x: hidden;
-            margin: 0;
-        }
-
-        /* Utilidades de Animación */
-        .fade-out { opacity: 0; transition: opacity 1s ease-out; pointer-events: none; }
-        .fade-in { animation: fadeIn 1s ease-in forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .hidden-section { display: none !important; }
-
-        /* Estilos Tarjetas Hub */
-        .hub-card { transition: all 0.3s ease; cursor: pointer; border: 1px solid #30363d; }
-        .hub-card:hover { transform: translateY(-10px); }
-
-        /* --- ESTILOS ESPECÍFICOS DEL JUEGO (Aislados) --- */
-        #game-screen {
-            font-family: 'Orbitron', sans-serif;
-            background: #0d001a;
-            color: #fff;
-            text-align: center;
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        #game-screen h1 {
-            font-size: 2.5em;
-            text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
-            margin-bottom: 10px;
-            margin-top: 40px;
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow { from { text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; } to { text-shadow: 0 0 30px #ff00ff, 0 0 50px #00ffff; } }
-
-        /* Botones Juego */
-        .cyber-btn {
-            background: linear-gradient(145deg, #ff00ff, #00ffff);
-            border: 2px solid #00ffff;
-            border-radius: 12px;
-            padding: 14px 24px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #fff;
-            text-shadow: 0 0 6px #fff;
-            box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff inset;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 10px;
-            font-family: 'Orbitron', sans-serif;
-        }
-        .cyber-btn:hover { transform: scale(1.08); box-shadow: 0 0 40px #00ffff, 0 0 80px #ff00ff inset; }
-
-        .exit-game-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 0, 0, 0.2);
-            border: 1px solid red;
-            color: white;
-            padding: 8px 16px;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            z-index: 1000;
-            border-radius: 8px;
-        }
-        .exit-game-btn:hover { background: red; }
-
-        #game-info {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 16px;
-            border-radius: 10px;
-            border: 2px solid #ff00ff;
-            background: rgba(0, 0, 0, 0.4);
-            text-shadow: 0 0 8px #00ffff, 0 0 6px #ff00ff;
-            font-size: 16px;
-            animation: hudGlow 2s infinite alternate;
-        }
-        @keyframes hudGlow { from { box-shadow: 0 0 10px #0ff, 0 0 20px #f0f; } to { box-shadow: 0 0 25px #0ff, 0 0 50px #f0f; } }
-
-        #game-board {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            max-width: 800px;
-            margin: 30px auto;
-            gap: 15px;
-            justify-items: center;
-        }
-        .carta {
-            width: 100px;
-            height: 150px;
-            perspective: 1000px;
-            position: relative;
-            cursor: pointer;
-        }
-        .carta .cara {
-            position: absolute;
-            inset: 0;
+            background-color: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
-            backface-visibility: hidden;
-            border-radius: 16px;
-            font-size: 24px;
-            font-weight: 700;
-            transition: transform 0.6s ease, box-shadow 0.3s;
-            text-shadow: 0 0 8px #fff;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
-        .front { background: linear-gradient(145deg, #1b0033, #4b00ff); color: #00ffff; box-shadow: 0 0 20px #00ffff inset, 0 0 10px #ff00ff; }
-        .back { background: linear-gradient(145deg, #33001b, #ff00ff); transform: rotateY(180deg); box-shadow: 0 0 20px #ff00ff inset, 0 0 10px #00ffff; }
-        .carta.volteada .front { transform: rotateY(180deg); }
-        .carta.volteada .back { transform: rotateY(0deg); }
-        .carta.seleccionada .front { transform: scale(1.1); animation: selectedGlow 1s infinite alternate; }
-        
-        #game-log {
-            margin: 20px auto;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            max-width: 800px;
-            min-height: 60px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid #00ffff;
-            border-radius: 10px;
-            padding: 12px;
-            color: #0ff;
-            text-shadow: 0 0 4px #0ff, 0 0 6px #f0f;
+        .case-container {
+            border: 2px solid #00ff00;
+            padding: 30px;
+            background: #111;
+            box-shadow: 0 0 20px #00ff0055;
+            text-align: center;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
         }
-
-        #game-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
+        h1 { font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; }
+        .deploy-btn {
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
         }
-
-        /* Estilos de Contenido Geografía */
-        .content-block {
-            margin-bottom: 4rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid #30363d;
+        .deploy-btn:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 30px #00ff00;
         }
-        .content-block:last-child {
-            border-bottom: none;
-        }
-        .bullet-point {
-            position: relative;
-            padding-left: 1.5rem;
-        }
-        .bullet-point::before {
-            content: '•';
-            color: #1f7d54;
-            font-size: 1.5rem;
-            position: absolute;
-            left: 0;
-            top: -0.1rem;
-        }
-
-        /* ESTILOS DEL EXAMEN */
-        .option-btn {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.5rem;
-            background-color: #21262d;
-            border: 1px solid #30363d;
-            transition: all 0.2s;
-            color: #c9d1d1;
-        }
-        .option-btn:hover:not(:disabled) {
-            background-color: #30363d;
-            border-color: #8b949e;
-        }
-        .option-btn.correct {
-            background-color: #1f6feb; /* Verde/Azul para correcto */
-            border-color: #1f6feb;
-            color: white;
-        }
-        .option-btn.wrong {
-            background-color: #da3633; /* Rojo para incorrecto */
-            border-color: #da3633;
-            color: white;
-        }
-
-        /* --- FONDO ANIMADO (SECTOR PRIMARIO) --- */
-        .fondo-sector-primario {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(#87ceeb, #b4e1ff); /* Cielo */
-            z-index: 0;
-            pointer-events: none; /* Para que no interfiera con el scroll */
-        }
-
-        .sol {
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, #ffeb3b, #fbc02d);
-            border-radius: 50%;
-            position: absolute;
-            top: 50px;
-            right: -120px;
-            animation: moverSol 20s linear infinite;
-            filter: blur(1px);
-        }
-
-        @keyframes moverSol {
-            0% { transform: translateX(0px) translateY(0px); }
-            50% { transform: translateX(-40vw) translateY(20vh); }
-            100% { transform: translateX(0px) translateY(0px); }
-        }
-
-        .nube {
-            width: 200px;
-            height: 80px;
-            background: white;
-            border-radius: 100px;
-            position: absolute;
-            opacity: 0.8;
-            filter: blur(1px);
-        }
-
-        .nube::before, .nube::after {
-            content: "";
-            position: absolute;
-            background: white;
-            border-radius: 100px;
-        }
-
-        .nube::before { width: 120px; height: 60px; left: -40px; top: 10px; }
-        .nube::after { width: 140px; height: 70px; left: 80px; top: -20px; }
-
-        .nube1 { top: 100px; left: -250px; animation: moverNube1 45s linear infinite; }
-        .nube2 { top: 200px; left: -350px; animation: moverNube2 60s linear infinite; }
-
-        @keyframes moverNube1 {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(140vw); }
-        }
-
-        @keyframes moverNube2 {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(150vw); }
-        }
-
-        .suelo {
-            width: 100%;
-            height: 30vh;
-            background: linear-gradient(#3f9e2f, #2d7e23);
-            position: absolute;
-            bottom: 0;
-            animation: moverPasto 8s ease-in-out infinite alternate;
-        }
-
-        @keyframes moverPasto {
-            0% { background-position: 0 0; }
-            100% { background-position: 20px 10px; }
-        }
+        .status { margin-top: 20px; font-size: 0.8rem; opacity: 0.7; }
+        #hidden-script { display: none; }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col">
+<body>
 
-    <div id="intro-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000">
-        <div class="text-center animate-pulse px-4">
-            <h1 class="text-3xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">BIENVENIDOS</h1>
-            <p class="text-xl md:text-3xl text-white mt-4">A nuestro trabajo de Geografía</p>
-            <div class="w-24 h-1 bg-[#1f7d54] mx-auto mt-6 rounded-full"></div>
-            <p class="text-gray-400 mt-2">Akram y Carlos</p>
-        </div>
-    </div>
+<div class="case-container">
+    <h1><span class="blink">●</span> GHOST_ENGINE v6.0</h1>
+    <p>CARGADOR DE PAYLOAD UNIFICADO</p>
+    <button class="deploy-btn" onclick="copyPayload()">EJECUTAR CARGA</button>
+    <div id="status-msg" class="status">SISTEMA EN ESPERA...</div>
+</div>
 
-    <div id="cover-screen" class="hidden-section fixed inset-0 z-40 flex flex-col items-center justify-center bg-[#0d1117] bg-[url('https://images.unsplash.com/photo-1625246333195-5848c4282ee8?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-        <div class="relative z-10 text-center max-w-3xl px-6 fade-in">
-            <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4">El Sector Primario</h1>
-            <button onclick="goToHub()" class="mt-8 px-8 py-4 bg-[#1f7d54] text-white font-bold rounded-full hover:scale-105 transition-transform">
-                Comenzar Presentación
-            </button>
-        </div>
-    </div>
+<textarea id="hidden-script">
+// --- GHOST ENGINE v6.0: UNIFIED OVERLORD (AI + UNIVERSAL INJECTION) ---
+const API_KEY = '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'; 
 
-    <div id="hub-screen" class="hidden-section min-h-screen flex flex-col items-center justify-center p-6 relative">
-        <div class="text-center mb-12 fade-in">
-            <h2 class="text-3xl font-bold text-white mb-2">Selecciona un Área</h2>
-        </div>
+async function ultimateSolve() {
+    const questionElement = document.querySelector('[data-functional-selector="block-title"]');
+    const imageElement = document.querySelector('[data-functional-selector="media-container__media-image"]');
+    const answerLabels = document.querySelectorAll('[data-functional-selector^="question-choice-text-"]');
+    
+    const potentialInputs = document.querySelectorAll('input, textarea, [contenteditable="true"]');
+    let smartInput = null;
+    potentialInputs.forEach(el => { if (el.offsetParent !== null && !el.disabled) smartInput = el; });
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full fade-in">
-            
-            <div onclick="enterGeoSubHub()" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-[#1f7d54]">
-                <div class="w-20 h-20 rounded-full bg-blue-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="book-open" class="w-10 h-10 text-blue-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">El Trabajo</h3>
-                <p class="text-sm text-gray-400">Contenido del Sector Primario.</p>
-            </div>
-
-            <div onclick="enterExam()" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-red-500">
-                <div class="w-20 h-20 rounded-full bg-red-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="graduation-cap" class="w-10 h-10 text-red-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">El Examen</h3>
-                <p class="text-sm text-gray-400">Demuestra lo que has aprendido.</p>
-            </div>
-
-            <div onclick="enterGame()" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-[#ff00ff]">
-                <div class="w-20 h-20 rounded-full bg-purple-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="gamepad-2" class="w-10 h-10 text-[#ff00ff]"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">Juego de Cartas</h3>
-                <p class="text-sm text-gray-400">Juego de cartas interactivo.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="geo-sub-hub" class="hidden-section min-h-screen flex flex-col items-center justify-center p-6 relative bg-[#0d1117]">
-        <button onclick="backToHubFromSub()" class="absolute top-6 left-6 text-white bg-[#21262d] px-4 py-2 rounded-lg border border-[#30363d] flex items-center gap-2 hover:bg-[#30363d]">
-            <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Inicio
-        </button>
-
-        <div class="text-center mb-12 fade-in">
-            <h2 class="text-3xl font-bold text-[#1f7d54] mb-2">Contenidos del Trabajo</h2>
-            <p class="text-gray-400">Selecciona el apartado que quieres estudiar</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full fade-in">
-            
-            <div onclick="renderGeoGroup('fundamentos')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-green-400">
-                <div class="w-20 h-20 rounded-full bg-green-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="sprout" class="w-10 h-10 text-green-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">Sector Primario y Fundamentos</h3>
-                <p class="text-sm text-gray-400">Definiciones, Agricultura, Ganadería, Pesca y Silvicultura.</p>
-            </div>
-
-            <div onclick="renderGeoGroup('problemas')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-yellow-400">
-                <div class="w-20 h-20 rounded-full bg-yellow-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="alert-triangle" class="w-10 h-10 text-yellow-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">Problemas y Características</h3>
-                <p class="text-sm text-gray-400">España, Impacto ambiental, retos y características económicas.</p>
-            </div>
-
-            <div onclick="renderGeoGroup('historia')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-blue-400">
-                <div class="w-20 h-20 rounded-full bg-blue-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="scroll" class="w-10 h-10 text-blue-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">Evolución y Desigualdades</h3>
-                <p class="text-sm text-gray-400">Historia y diferencias Norte-Sur.</p>
-            </div>
-            <div onclick="renderGeoGroup('secundario')" class="hub-card bg-[#161b22] p-8 rounded-2xl flex flex-col items-center text-center group hover:border-sky-400">
-                <div class="w-20 h-20 rounded-full bg-sky-900/30 flex items-center justify-center mb-6">
-                    <i data-lucide="factory" class="w-10 h-10 text-sky-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">Sector Secundario</h3>
-                <p class="text-sm text-gray-400">Industria, Energía y Construcción.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="geo-content-screen" class="hidden-section min-h-screen flex flex-col bg-transparent relative p-4 md:p-8">
+    if (questionElement && !questionElement.dataset.solved) {
+        questionElement.dataset.solved = "true";
         
-        <div class="fondo-sector-primario">
-            <div class="sol"></div>
-            <div class="nube nube1"></div>
-            <div class="nube nube2"></div>
-            <div class="suelo"></div>
-        </div>
+        const questionText = questionElement.innerText;
+        const options = Array.from(answerLabels).map(btn => btn.innerText.trim());
+        const imageUrl = imageElement ? imageElement.src : null;
 
-        <button onclick="backToGeoSubHub()" class="fixed top-4 left-4 md:top-8 md:left-8 z-50 text-white bg-[#1f7d54] px-4 py-2 rounded-full shadow-lg flex items-center gap-2 hover:bg-[#166442] transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Tarjetas
-        </button>
-        
-        <main class="max-w-4xl mx-auto w-full mt-12 fade-in relative z-10">
-            <div id="geo-dynamic-content" class="bg-[#161b22]/95 p-8 rounded-2xl border border-[#30363d] shadow-2xl backdrop-blur-sm">
-                </div>
-        </main>
-    </div>
+        console.log("📡 ESCANEANDO OBJETIVO...");
 
-    <div id="exam-screen" class="hidden-section min-h-screen flex flex-col bg-[#0d1117] items-center justify-center p-4">
-        <div class="w-full max-w-2xl bg-[#161b22] border border-[#30363d] rounded-2xl p-6 md:p-8 shadow-2xl relative">
-            <button onclick="backToHubFromExam()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
+        const modelToUse = "llama-3.1-8b-instant"; // Cambiado a Instant para máxima obediencia
 
-            <div id="exam-start-view" class="text-center">
-                <div class="w-20 h-20 rounded-full bg-red-900/30 flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="file-check" class="w-10 h-10 text-red-400"></i>
-                </div>
-                <h2 class="text-3xl font-bold text-white mb-4">Examen: Sector Primario</h2>
-                <p class="text-gray-400 mb-8">25 Preguntas interactivas. ¡Demuestra lo que sabes!</p>
-                <div class="bg-[#21262d] p-4 rounded-lg border border-[#ff00ff]/30 mb-6 text-left">
-                    <p class="text-[#ff00ff] font-bold flex items-center gap-2"><i data-lucide="coins"></i> MODO COOPERATIVO</p>
-                    <p class="text-sm text-gray-400">Cada pregunta te pedirá quién la responde. Si aciertas, esa persona ganará <strong>+1 Moneda</strong> para el Juego de Cartas.</p>
-                </div>
-                <button onclick="startExam()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition-colors w-full md:w-auto">
-                    Comenzar Examen
-                </button>
-            </div>
+        try {
+            let messageContent = [{ 
+                type: "text", 
+                text: `Pregunta: "${questionText}". ${options.length ? "Opciones: [" + options.join(", ") + "]." : "Responde con la palabra exacta."} Responde SOLO con el texto de la respuesta corta.` 
+            }];
 
-            <div id="exam-question-view" class="hidden-section">
-                <div class="flex justify-between items-center mb-6">
-                    <span class="text-sm font-mono text-gray-400">Pregunta <span id="current-q-num">1</span>/25</span>
-                    <span class="text-sm font-mono text-red-400" id="score-display">Puntos: 0</span>
-                </div>
-                
-                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-white mb-8"></h3>
-                
-                <div id="options-container" class="space-y-3">
-                    </div>
-                
-                <div id="feedback-msg" class="mt-4 text-center font-bold min-h-[4rem]"></div>
-
-                <button id="next-q-btn" onclick="nextQuestion()" class="mt-6 w-full bg-[#1f7d54] hover:bg-[#166442] text-white font-bold py-3 px-6 rounded-lg hidden-section">
-                    Siguiente Pregunta
-                </button>
-            </div>
-
-            <div id="exam-result-view" class="hidden-section text-center">
-                <h2 class="text-3xl font-bold text-white mb-2">¡Examen Finalizado!</h2>
-                <p class="text-gray-400 mb-6">Resultados finales</p>
-                
-                <div class="text-6xl font-extrabold text-[#1f7d54] mb-2" id="final-score">0/25</div>
-                <p class="text-xl text-white mb-8" id="final-msg">Mensaje</p>
-                
-                <div class="flex gap-4 justify-center">
-                    <button onclick="resetExam()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg">Repetir</button>
-                    <button onclick="backToHubFromExam()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">Salir</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-screen" class="hidden-section">
-        <button onclick="backToHubFromGame()" class="exit-game-btn">SALIR DEL JUEGO</button>
-        
-        <h1>Juego de Cartas</h1>
-        <button id="game-start-btn" class="cyber-btn">Iniciar ronda</button>
-        <div id="game-info"></div>
-        <div id="game-board"></div>
-        <div id="game-log">Bienvenido al Juego de Cartas. Pulsa "Iniciar ronda".</div>
-        <canvas id="game-canvas"></canvas>
-    </div>
-
-    <script>
-        // --- FUNCIONES GLOBALES DE USUARIO ---
-        function cargarJugador(nombre) {
-            let jugadores = JSON.parse(localStorage.getItem('jugadores') || '[]');
-            let j = jugadores.find(p => p.nombre === nombre);
-            if (!j) { 
-                j = { nombre, dinero: 1 }; 
-                jugadores.push(j); 
-                localStorage.setItem('jugadores', JSON.stringify(jugadores)); 
+            if (imageUrl) {
+                const b64 = await getBase64(imageUrl);
+                messageContent.push({ type: "image_url", image_url: { url: b64 } });
             }
-            return j;
-        }
 
-        function guardarJugador(j) {
-            let jugadores = JSON.parse(localStorage.getItem('jugadores') || '[]');
-            let idx = jugadores.findIndex(p => p.nombre === j.nombre);
-            if(idx !== -1) {
-                jugadores[idx] = j;
-                localStorage.setItem('jugadores', JSON.stringify(jugadores));
-            }
-        }
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: modelToUse, messages: [{ role: "user", content: messageContent }], temperature: 0.0, max_tokens: 40 })
+            });
 
-        // --- TEXTOS COMPLETOS Y DETALLADOS ---
-        const contentData = {
-            fundamentos: `
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-[#1f7d54] pb-2">🌐 1. SECTOR PRIMARIO: Concepto</h2>
-                    <p class="text-gray-300 leading-relaxed mb-4 text-lg bg-[#21262d] p-6 rounded-lg border-l-4 border-[#1f7d54]">
-                        El sector primario es aquella área de la economía la cual se dedica a <strong>extraer recursos de la naturaleza  sin modificarlos</strong>. El sector primario es la base primordial de el resto de la economía debido a que es el que da las materias primas y alimento a los demás sectores.
-                    </p>
-                    <h3 class="text-xl font-bold text-white mt-8 mb-4">🗺️ Áreas Principales</h3>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div class="bg-[#21262d] p-4 rounded-lg bullet-point"><p class="text-lg font-semibold text-[#1f7d54]">Ganadería</p></div>
-                        <div class="bg-[#21262d] p-4 rounded-lg bullet-point"><p class="text-lg font-semibold text-[#1f7d54]">Pesca</p></div>
-                        <div class="bg-[#21262d] p-4 rounded-lg bullet-point"><p class="text-lg font-semibold text-[#1f7d54]">Agricultura</p></div>
-                        <div class="bg-[#21262d] p-4 rounded-lg bullet-point"><p class="text-lg font-semibold text-[#1f7d54]">Silvicultura</p></div>
-                    </div>
-                </div>
+            const data = await response.json();
+            const aiAnswer = data.choices[0].message.content.trim();
+            console.log(`🤖 IA (${modelToUse}):`, aiAnswer);
 
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-[#1f7d54] pb-2">🌾 2. LA AGRICULTURA</h2>
-                    <p class="text-gray-300 mb-6 text-lg">Conjunto de técnicas y conocimientos relativos relacionados con la <strong>producción de alimentos de origen vegetal</strong>.</p>
-                    
-                    <h3 class="text-xl font-bold text-[#79c0ff] mt-6 mb-3 border-l-4 border-blue-500 pl-3">A. Tipos según su Enfoque</h3>
-                    <div class="space-y-4 mb-8">
-                        <div class="bg-[#21262d] p-5 rounded-lg">
-                            <p class="text-lg font-bold text-white mb-1">Subsistencia</p>
-                            <p class="text-sm text-gray-400">Su objetivo principal es satisfacer necesidades momentáneas. Se caracteriza por una gran mano de obra y el uso de métodos tradicionales y poco tecnológicos.</p>
-                        </div>
-                        <div class="bg-[#21262d] p-5 rounded-lg">
-                            <p class="text-lg font-bold text-white mb-1">Industrial</p>
-                            <p class="text-sm text-gray-400">Su objetivo es generar volúmenes industriales para comercializar. Se caracteriza por un gran uso de tecnología y poca mano de obra.</p>
-                        </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-[#79c0ff] mt-6 mb-3 border-l-4 border-blue-500 pl-3">B. Tipos según Uso de Tierra</h3>
-                    <div class="space-y-4">
-                        <div class="bg-[#21262d] p-5 rounded-lg">
-                            <p class="text-lg font-bold text-white mb-1">Intensiva</p>
-                            <p class="text-sm text-gray-400">Busca la máxima explotación de la tierra. Requiere un gran uso de capital y tecnología en espacios reducidos.</p>
-                        </div>
-                        <div class="bg-[#21262d] p-5 rounded-lg">
-                            <p class="text-lg font-bold text-white mb-1">Extensiva</p>
-                            <p class="text-sm text-gray-400">Utiliza grandes porciones de terreno. Suele tener costes de producción más bajos y técnicas más simples.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-[#1f7d54] pb-2">🐄 3. LA GANADERÍA</h2>
-                    <p class="text-gray-300 mb-6 text-lg">Producción y crianza de animales para la alimentación u otros productos.</p>
-                    
-                    <h3 class="text-xl font-semibold text-[#79c0ff] mb-4">Sistemas de Cría</h3>
-                    <div class="grid gap-4">
-                        <div class="bg-[#21262d] p-5 rounded-lg border border-[#30363d]">
-                            <h3 class="font-bold text-[#1f7d54] text-lg mb-2">Intensiva / Macrogranjas</h3>
-                            <p class="text-gray-400">Los animales están concentrados en establos o instalaciones cerradas para maximizar la producción en el menor espacio posible.</p>
-                        </div>
-                        <div class="bg-[#21262d] p-5 rounded-lg border border-[#30363d]">
-                            <h3 class="font-bold text-[#1f7d54] text-lg mb-2">Extensiva</h3>
-                            <p class="text-gray-400">Los animales se crían al aire libre en grandes terrenos, aprovechando los recursos naturales del entorno.</p>
-                        </div>
-                        <div class="bg-[#21262d] p-5 rounded-lg border border-[#30363d]">
-                            <h3 class="font-bold text-[#1f7d54] text-lg mb-2">Semiextensiva</h3>
-                            <p class="text-gray-400">Es una mezcla: los animales pasan tiempo en establos pero también tienen acceso al exterior y mayor libertad.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-[#1f7d54] pb-2">🐟 4. PESCA Y SILVICULTURA</h2>
-                    
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-white mb-4">🎣 La Pesca</h3>
-                        <p class="text-gray-400 mb-4">Extracción de organismos acuáticos de su medio natural.</p>
-                        
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="bg-[#21262d] p-4 rounded-lg">
-                                <strong class="text-[#79c0ff] block mb-2">Por Zona:</strong>
-                                <ul class="list-disc pl-4 text-gray-300 space-y-1">
-                                    <li><strong>Marítima:</strong> Se divide en pesca de Altura (lejos de la costa, industrial) y de Bajura (cerca de la costa, tradicional).</li>
-                                    <li><strong>Continental:</strong> Se realiza en ríos, lagos y pantanos.</li>
-                                </ul>
-                            </div>
-                            <div class="bg-[#21262d] p-4 rounded-lg">
-                                <strong class="text-[#79c0ff] block mb-2">Por Objetivo:</strong>
-                                <ul class="list-disc pl-4 text-gray-300 space-y-1">
-                                    <li><strong>Industrial:</strong> Busca máxima captura con tecnología avanzada.</li>
-                                    <li><strong>Artesanal:</strong> Enfocada al consumo local con técnicas tradicionales.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-2xl font-bold text-white mb-4">🌲 La Silvicultura</h3>
-                        <p class="text-gray-300 bg-[#21262d] p-4 rounded mb-4">Cultivo, cuidado y explotación racional de bosques y montes para producción de madera.</p>
-                        <div class="space-y-3 pl-4 border-l-2 border-gray-600">
-                            <div>
-                                <h4 class="font-bold text-white">Bosques Naturales</h4>
-                                <p class="text-gray-400 text-sm">Explotación extensiva. Crecimiento lento y tala selectiva.</p>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white">Plantaciones</h4>
-                                <p class="text-gray-400 text-sm">Explotación intensiva. Monocultivos de crecimiento rápido para la industria.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `,
-            problemas: `
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-yellow-500 pb-2">🚨 GRANDES PROBLEMAS Y RETOS</h2>
-                    
-                    <div class="bg-red-900/20 border border-red-500/50 p-6 rounded-xl mb-8">
-                        <h3 class="text-xl font-bold text-red-400 mb-4 flex items-center gap-2"><i data-lucide="alert-triangle"></i> Impacto Ambiental</h3>
-                        <ul class="space-y-4 text-gray-300">
-                            <li class="bg-[#21262d]/50 p-3 rounded">
-                                <strong class="text-white block">📉 Degradación del suelo:</strong>
-                                La erosión y la sobreexplotación están agotando los nutrientes de la tierra.
-                            </li>
-                            <li class="bg-[#21262d]/50 p-3 rounded">
-                                <strong class="text-white block">🧪 Contaminación:</strong>
-                                El uso excesivo de pesticidas y fertilizantes químicos contamina acuíferos y suelos.
-                            </li>
-                            <li class="bg-[#21262d]/50 p-3 rounded">
-                                <strong class="text-white block">💨 Emisiones de gases:</strong>
-                                La ganadería intensiva es una de las mayores productoras de metano, un gas de efecto invernadero potente.
-                            </li>
-                            <li class="bg-[#21262d]/50 p-3 rounded">
-                                <strong class="text-white block">🌲 Deforestación:</strong>
-                                La tala indiscriminada para crear nuevos campos de cultivo destruye ecosistemas enteros.
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <h3 class="text-2xl font-bold text-yellow-400 mb-4">Retos Sociales</h3>
-                    <div class="bg-[#21262d] p-6 rounded-lg text-gray-300 space-y-3">
-                        <p><strong>Éxodo Rural:</strong> La despoblación de las zonas rurales ("La España Vaciada") debido a la falta de oportunidades.</p>
-                        <p><strong>Competencia Desleal:</strong> La dificultad de los pequeños agricultores para competir con los precios de las grandes multinacionales.</p>
-                    </div>
-                </div>
-
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-yellow-500 pb-2">✨ CARACTERÍSTICAS DEL SECTOR</h2>
-                    <div class="grid gap-6">
-                        <div class="bg-[#21262d] p-6 rounded-lg flex gap-4 items-start">
-                            <div class="bg-blue-900/30 p-3 rounded-full"><i data-lucide="cloud-rain" class="text-blue-400 w-8 h-8"></i></div>
-                            <div>
-                                <h4 class="text-xl font-bold text-white mb-2">Dependencia del Clima</h4>
-                                <p class="text-gray-400">Es el único sector que depende totalmente de factores incontrolables. Una sequía, una helada o una inundación pueden destruir la economía de una región entera en días.</p>
-                            </div>
-                        </div>
-                        <div class="bg-[#21262d] p-6 rounded-lg flex gap-4 items-start">
-                            <div class="bg-green-900/30 p-3 rounded-full"><i data-lucide="dollar-sign" class="text-green-400 w-8 h-8"></i></div>
-                            <div>
-                                <h4 class="text-xl font-bold text-white mb-2">Volatilidad de Precios</h4>
-                                <p class="text-gray-400">Los precios son inestables en los mercados internacionales. Un exceso de oferta mundial puede hundir los precios, haciendo que a los agricultores no les salga rentable recoger la cosecha.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-red-500 pb-2">🇪🇸 EL SECTOR PRIMARIO EN ESPAÑA</h2>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-[#21262d] p-6 rounded-lg">
-                            <h3 class="text-xl font-bold text-yellow-400 mb-3">Características</h3>
-                            <ul class="space-y-2 text-gray-300 text-sm">
-                                <li><strong>Gran Diversidad:</strong> Desde la huerta mediterránea hasta el secano cerealista y el plátano canario.</li>
-                                <li><strong>Potencia Exportadora:</strong> Conocida como la "Huerta de Europa" (frutas, hortalizas, aceite de oliva, vino).</li>
-                                <li><strong>Modernización:</strong> Alto uso de invernaderos (Almería) y regadío.</li>
-                            </ul>
-                        </div>
-                        <div class="bg-[#21262d] p-6 rounded-lg">
-                            <h3 class="text-xl font-bold text-red-400 mb-3">Problemas Específicos</h3>
-                            <ul class="space-y-2 text-gray-300 text-sm">
-                                <li><strong>Envejecimiento:</strong> Falta de relevo generacional. Los jóvenes no quieren trabajar el campo.</li>
-                                <li><strong>España Vaciada:</strong> Despoblación masiva del interior rural.</li>
-                                <li><strong>Sequía y Agua:</strong> Estrés hídrico severo en el sur y levante.</li>
-                                <li><strong>Rentabilidad:</strong> Precios bajos en origen vs altos en supermercado.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `,
-            historia: `
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-blue-500 pb-2">📜 1. EVOLUCIÓN HISTÓRICA: Del Azada al Robot</h2>
-                    <p class="text-lg text-gray-300 mb-6 bg-[#21262d] p-4 rounded-lg border-l-4 border-blue-500">
-                        La historia del sector primario es la historia de la humanidad. El sector ha pasado de ser la única actividad que conocíamos a ser la más tecnificada, liberando mano de obra para otros sectores.
-                    </p>
-                    
-                    <div class="space-y-8">
-                        <div class="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
-                            <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">La Gran Transición: El Neolítico (Hace 10.000 años)</h3>
-                            <p class="text-gray-400">
-                                Antes, éramos cazadores y recolectores . La invención de la agricultura y la ganadería lo cambió todo. Por primera vez, el ser humano podía producir su propio alimento, lo que obligó a la gente a volverse sedentaria (quedarse en un sitio). Este fue el primer gran cambio demográfico y el inicio de los poblados estables.
-                            </p>
-                        </div>
-
-                        <div class="bg-[#21262d] p-6 rounded-xl border border-[#30363d]">
-                            <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">Agricultura de Supervivencia: La Edad Media</h3>
-                            <p class="text-gray-400">
-                                Durante siglos, la agricultura fue de subsistencia: solo se producía lo justo para comer y pagar tributos al señor feudal. ademas en esta epoca la agricutura era extremadamente sensible a desastres natuales pudiendo provocar ambrunas masivas en la poblacion
-                            </p>
-                        </div>
-
-                        <div class="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
-                            <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">La Gran Productividad: Revolución Agrícola (Siglo XVIII)</h3>
-                            <p class="text-gray-400">
-                                Con la Ilustración y la necesidad de alimentar a una población creciente Se inventaron las primeras máquinas (como la sembradora mecánica). Esto provocó un aumento masivo de la productividad y generó un excedente de alimentos. Este excedente fue crucial, pues permitió que mucha gente pudiera dejar el campo e ir a las ciudades, alimentando la posterior Revolución Industrial.
-                            </p>
-                            
-                        </div>
-
-                        <div class="bg-[#21262d] p-6 rounded-xl border border-[#30363d]">
-                            <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">La Era Química: Revolución Verde (Mediados del S. XX)</h3>
-                            <p class="text-gray-400">
-                                Tras la Segunda Guerra Mundial, la tecnología se aplicó al campo a lo bestia: abonos químicos, pesticidas sintéticos y el desarrollo de semillas de alto rendimiento (variedades mejoradas). Esto multiplicó las cosechas, salvando a miles de millones de personas de la hambruna, pero a cambio de un gran impacto ambiental (contaminación del agua, dependencia de productos químicos).
-                            </p>
-                        </div>
-
-                        <div class="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
-                            <h3 class="text-2xl font-bold text-[#79c0ff] mb-3">El Campo Globalizado: Actualidad</h3>
-                            <p class="text-gray-400">
-                                Hoy, el sector está dominado por la tecnología (tractores con GPS, drones, sensores). La biotecnología (OGMs/Transgénicos) permite modificar genéticamente los cultivos. Lo más importante es la globalización: la comida viaja miles de kilómetros, y el precio de una cosecha en España puede depender de lo que se produzca ese año en Sudamérica o Asia.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-block">
-                    <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-blue-500 pb-2">⚖️ DESIGUALDADES: NORTE VS SUR</h2>
-                    <div class="grid md:grid-cols-3 gap-6"> 
-                        <div class="bg-[#21262d] p-6 rounded-xl border-t-4 border-blue-500 shadow-lg">
-                            <h3 class="text-xl font-bold text-white mb-4">Países Desarrollados</h3>
-                            <ul class="space-y-2 text-gray-400 text-sm">
-                                <li>• Alta tecnología y productividad.</li>
-                                <li>• Subsidios (PAC, Farm Bill).</li>
-                                <li>• Menos del 5% población activa.</li>
-                            </ul>
-                        </div>
-                        <div class="bg-[#21262d] p-6 rounded-xl border-t-4 border-yellow-500 shadow-lg">
-                            <h3 class="text-xl font-bold text-white mb-4">Países en Vías de Desarrollo</h3>
-                            <ul class="space-y-2 text-gray-400 text-sm">
-                                <li>• Dualidad: Plantaciones exportadoras vs agricultura tradicional.</li>
-                                <li>• Revolución Verde en proceso.</li>
-                                <li>• Gran parte de la población en el campo.</li>
-                            </ul>
-                        </div>
-                        <div class="bg-[#21262d] p-6 rounded-xl border-t-4 border-red-500 shadow-lg">
-                            <h3 class="text-xl font-bold text-white mb-4">Países Menos Adelantados (PMA)</h3>
-                            <ul class="space-y-2 text-gray-400 text-sm">
-                                <li>• Agricultura de subsistencia estricta.</li>
-                                <li>• Herramientas rudimentarias (azada).</li>
-                                <li>• Problemas de hambre y hambrunas.</li>
-                                <li>• Neocolonialismo: Venden materias primas baratas.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `, // COMA AÑADIDA AQUÍ
-            secundario: `
-        <div class="content-block">
-            <h2 class="text-3xl font-extrabold text-white mb-6 border-b border-sky-500 pb-2">🏭 SECTOR SECUNDARIO: Clasificación Industrial</h2>
-            
-            <div class="mb-8 p-4 bg-sky-900/20 border-l-4 border-sky-400 rounded-lg">
-                <h3 class="text-2xl font-bold text-sky-400 flex items-center mb-2"><i data-lucide="building" class="w-6 h-6 mr-2"></i> CLASIFICACIÓN INDUSTRIAL MODERNA</h3>
-                <p class="text-gray-300 italic mb-3">La industria se clasifica primordialmente según el destino del producto y la intensidad tecnológica y de capital requerida.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point">Criterio Base: Destino Final (Insumo vs. Consumo).</li>
-                    <li class="bullet-point">Factor Crítico: Inversión de Capital y Nivel de I+D (Investigación y Desarrollo).</li>
-                    <li class="bullet-point">Tendencia: Desplazamiento de la producción masiva a países en desarrollo.</li>
-                </ul>
-            </div>
-            
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">1. Industria Pesada (Base)</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">Definición: Transforma materias primas en productos semielaborados (p. ej., barras de metal, productos químicos) esenciales para el resto de la cadena industrial.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-green-400">Productos Típicos: Acero, Cementos especiales, Alúmina, Cloro.</li>
-                    <li class="bullet-point">Requerimientos: Uso intensivo de energía (electrolisis, hornos), enormes instalaciones y procesos continuos. Alto Capital Fijo.</li>
-                    <li class="bullet-point">Ubicación: Históricamente cerca de minas/carbón. Hoy, cerca de puertos o fuentes energéticas baratas (p. ej., hidroeléctricas).</li>
-                </ul>
-            </div>
-
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">2. Industria de Bienes de Equipo</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">**Definición:** Fabrica el instrumental y la infraestructura productiva (maquinaria, herramientas de precisión) necesaria para equipar otras fábricas.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-green-400">Productos Típicos: Turbinas, Chips de control industrial, Máquinas CNC, Líneas de montaje automatizadas.</li>
-                    <li class="bullet-point">Especialización: Requiere la mayor inversión en I+D (Investigación y Desarrollo) y personal altamente cualificado (ingenieros y técnicos).</li>
-                    <li class="bullet-point">Impacto: Es el motor de la modernización. Su rendimiento define la eficiencia tecnológica de un país.</li>
-                </ul>
-            </div>
-
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">3. Industria Ligera (Consumo)</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">**Definición:Genera bienes acabados y de uso directo, caracterizada por procesos flexibles que responden rápidamente a la demanda del mercado.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-green-400"Productos Típicos: Textil, Calzado, Alimentos procesados, Electrónica (smartphones, electrodomésticos).</li>
-                    <li class="bullet-point">Requerimientos: Más dependiente de la Mano de Obra (aunque cada vez más automatizada) y de la logística de distribución.</li>
-                    <li class="bullet-point">Ubicación: Típicamente cerca de grandes centros de consumo o en países con bajos salarios (por la deslocalización).</li>
-                </ul>
-            </div>
-
-            <h2 class="text-3xl font-extrabold text-white mb-6 mt-12 border-b border-yellow-500 pb-2">⚡ ENERGÍA: La Base del Desarrollo Industrial</h2>
-
-            <div class="mb-8 p-4 bg-yellow-900/20 border-l-4 border-yellow-400 rounded-lg">
-                <h3 class="text-2xl font-bold text-yellow-400 flex items-center mb-2"><i data-lucide="battery-charging" class="w-6 h-6 mr-2"></i> LA MATRIZ ENERGÉTICA GLOBAL</h3>
-                <p class="text-gray-300 italic mb-3">El consumo energético está directamente correlacionado con el nivel de industrialización y desarrollo de un país.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point">Dependencia Fósil: A pesar del auge renovable, el mundo sigue dependiendo en gran medida del petróleo y el gas.</li>
-                    <li class="bullet-point">Geopolítica: Los países productores de petróleo (OPEP) tienen un enorme poder e influencia global.</li>
-                    <li class="bullet-point">Transición: El desafío es asegurar el suministro para el crecimiento industrial mientras se descarboniza la economía.</li>
-                </ul>
-            </div>
-
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">1. Fuentes No Renovables (Finitas y Contaminantes)</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">Fuentes cuya velocidad de consumo supera la velocidad de su regeneración natural. Lideran la emisión de gases de efecto invernadero (GEI).</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-red-400">Carbón: Histórico motor de la I.R. Más contaminante, pero sigue siendo clave en países como China e India.</li>
-                    <li class="bullet-point text-red-400">Petróleo y Gas: Dominan el transporte y la industria química. Su volatilidad de precio afecta a toda la economía mundial.</li>
-                    <li class="bullet-point text-red-400">Nuclear: Controversial. Bajas emisiones de CO2 pero alto riesgo de accidentes y gestión de residuos radiactivos a largo plazo.</li>
-                </ul>
-            </div>
-            
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">2. Fuentes Renovables (Sostenibles e Inagotables)</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">Alternativas esenciales para un futuro sostenible. Su desafío principal es la estabilidad de la red (intermitencia).</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-green-400">Eólica y Solar: Lideran el crecimiento. Dependen de avances en sistemas de almacenamiento (baterías de Litio/Vanadio).</li>
-                    <li class="bullet-point text-green-400">Hidráulica: Fuente estable y madura, pero limitada geográficamente y con impactos ambientales locales (represas).</li>
-                    <li class="bullet-point text-green-400">Biomasa y Geotérmica: Usos más localizados. Aprovechan residuos orgánicos o el calor interno de la Tierra, respectivamente.</li>
-                </ul>
-            </div>
-
-            <h2 class="text-3xl font-extrabold text-white mb-6 mt-12 border-b border-red-500 pb-2">🌍 DESIGUALDADES Y GEOPOLÍTICA INDUSTRIAL</h2>
-            
-            <div class="mb-8 p-4 bg-red-900/20 border-l-4 border-red-400 rounded-lg">
-                <h3 class="text-2xl font-bold text-red-400 flex items-center mb-2"><i data-lucide="banknote" class="w-6 h-6 mr-2"></i> CONCENTRACIÓN DE PODER Y EL EJE NORTE-SUR</h3>
-                <p class="text-gray-300 italic mb-3">La distribución de la producción industrial consolida la división global: el Norte controla el capital y la tecnología; el Sur, la mano de obra y los recursos.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point">Norte Global (Ricos): Controlan la **Innovación** (I+D), la financiación, las patentes y las sedes centrales de las multinacionales.</li>
-                    <li class="bullet-point">Sur Global (Pobres): Suministran la **Mano de Obra Barata**, las materias primas y son los lugares de ensamblaje (la "fábrica" del mundo).</li>
-                    <li class="bullet-point">Resultado: Flujo de riqueza constante del Sur al Norte a través de los beneficios empresariales.</li>
-                </ul>
-            </div>
-            
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">1. Deslocalización y Empresas Multinacionales</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">Proceso: El traslado estratégico de procesos productivos (no de sedes) desde países desarrollados a países periféricos para reducir costes. </p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point">Factores de Atracción: Salarios mínimos, baja presión fiscal, legislación ambiental y laboral laxa (o inexistente).</li>
-                    <li class="bullet-point">Consecuencia (País Receptor): Creación de empleo precario, explotación laboral y fuerte dependencia de la empresa extranjera.</li>
-                    <li class="bullet-point">Consecuencia (País Emisor): Desindustrialización, aumento del paro en la industria y "tercerización" (dominio del sector servicios).</li>
-                </ul>
-            </div>
-            
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">2. Impacto Ambiental: La Deuda Ecológica</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">La producción industrial a gran escala exige un ritmo de consumo de recursos que la biosfera no puede sostener (sobreexplotación).</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point">Huella de Carbono: Emisiones directas de las fábricas, agravadas por el transporte global de productos (logística).</li>
-                    <li class="bullet-point">Contaminación Hídrica: Vertidos tóxicos de la industria química o textil en países con controles débiles.</li>
-                    <li class="bullet-point">Obsolescencia Programada: Estrategia de diseño para que los productos duren poco, forzando un ciclo de consumo y producción incesante.</li>
-                </ul>
-            </div>
-            
-            <h2 class="text-3xl font-extrabold text-white mb-6 mt-12 border-b border-purple-500 pb-2">🕰️ HISTORIA Y EVOLUCIÓN INDUSTRIAL (Las 4 Revoluciones)</h2>
-
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">El Camino a la Fábrica Inteligente</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">La industria ha pasado por cuatro grandes transformaciones, cada una marcada por una nueva fuente de energía o tecnología dominante.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-purple-400">I.R. 1.0 (Finales S. XVIII): Máquina de vapor. Mecanización textil y ferroviaria.</li>
-                    <li class="bullet-point text-purple-400">I.R. 2.0 (Finales S. XIX): Electricidad, petróleo. Producción en cadena (Taylorismo/Fordismo) y estandarización.</li>
-                    <li class="bullet-point text-purple-400">I.R. 3.0 (Década de 1970): Electrónica, Informática. Automatización simple (PLCs) y robots básicos.</li>
-                </ul>
-            </div>
-
-            <h4 class="text-xl font-semibold text-gray-200 mt-6 mb-2">La Industria 4.0: Ciber-Física</h4>
-            <div class="bg-gray-800 p-4 rounded-lg shadow-xl">
-                <p class="mb-3 text-sm text-gray-400">La cuarta revolución industrial une el mundo físico con el digital a través de sistemas ciber-físicos, permitiendo fábricas totalmente autónomas y adaptativas.</p>
-                <ul class="space-y-1 text-sm">
-                    <li class="bullet-point text-purple-400">Sistemas Clave: IoT (sensores en toda la cadena), Big Data (análisis masivo) e Inteligencia Artificial (toma de decisiones).</li>
-                    <li class="bullet-point">Personalización Masiva: La fábrica puede producir bienes únicos a la misma velocidad que produce masivamente.</li>
-                    <li class="bullet-point">Desafío Social: El aumento de la automatización genera un miedo real a la pérdida de empleos no cualificados, exigiendo una reestructuración de la fuerza laboral.</li>
-                </ul>
-            </div>
-        </div>
-    `
-};
-            
-        
-
-        // --- PREGUNTAS DEL EXAMEN (25 TOTAL) ---
-        const examQuestions = [
-            // Las 15 originales
-            {q:"¿Cuál pertenece al sector primario?", options:["Transporte","Agricultura","Medicina","Informática"], correct:1, tip:"Agricultura pertenece al sector primario."},
-            {q:"La pesca artesanal usa...", options:["Barcos industriales","Técnicas locales","Robots automáticos","Redes gigantes"], correct:1, tip:"La pesca artesanal utiliza técnicas locales y tradicionales."},
-            {q:"La minería sostenible busca...", options:["Máxima extracción","Cero normas","Minimizar impacto","Contaminar más"], correct:2, tip:"Busca minimizar el impacto ambiental."},
-            {q:"Agricultura ecológica incluye...", options:["Muchos químicos","Rotación de cultivos","Monocultivo eterno","Quema constante"], correct:1, tip:"La rotación de cultivos ayuda a mantener la fertilidad del suelo."},
-            {q:"El sector primario extrae...", options:["Servicios","Tecnologías","Recursos naturales","Software"], correct:2, tip:"El sector primario se basa en recursos naturales."},
-            {q:"La ganadería forma parte de...", options:["Sector primario","Sector secundario","Sector terciario","Sector cuaternario"], correct:0, tip:"La ganadería es parte del sector primario."},
-            {q:"El cultivo de cereales pertenece a...", options:["Sector primario","Sector secundario","Sector terciario","Sector cuaternario"], correct:0, tip:"Los cereales se cultivan, por tanto es sector primario."},
-            {q:"La acuicultura es...", options:["Pesca en río y mar","Industria manufacturera","Transporte marítimo","Turismo rural"], correct:0, tip:"La acuicultura se basa en la cría de organismos acuáticos."},
-            {q:"La reforestación es importante para...", options:["Conservar el suelo y agua","Aumentar industria","Crear carreteras","Construir ciudades"], correct:0, tip:"La reforestación ayuda a conservar suelo y agua."},
-            {q:"La minería metálica se centra en...", options:["Extracción de minerales","Producción de energía","Comercio internacional","Educación"], correct:0, tip:"Extrae minerales metálicos del suelo."},
-            {q:"La horticultura estudia...", options:["Cultivo de hortalizas","Pesca industrial","Ganado bovino","Minería"], correct:0, tip:"Se centra en cultivar hortalizas."},
-            {q:"El sector primario depende de...", options:["Recursos naturales","Tecnología avanzada","Marketing","Banca"], correct:0, tip:"Depende de los recursos naturales disponibles."},
-            {q:"La apicultura consiste en...", options:["Cría de abejas para miel","Construcción de casas","Producción de coches","Software"], correct:0, tip:"Se crían abejas para producir miel y otros productos."},
-            {q:"La pesca industrial se caracteriza por...", options:["Uso de grandes barcos y redes","Cosecha manual","Cultivos ecológicos","Educación"], correct:0, tip:"Se usan barcos grandes y redes industriales."},
-            {q:"El comercio de productos agrícolas se ubica en...", options:["Sector terciario","Sector primario","Sector secundario","Sector cuaternario"], correct:0, tip:"La venta es sector terciario, producción es primario."},
-            // 10 Nuevas preguntas
-            {q:"¿Qué es la PAC?", options:["Política Agraria Común","Plan Agrícola Central","Producción Alta Calidad","Pacto Agrario Comercial"], correct:0, tip:"Es la Política Agrícola Común de la Unión Europea."},
-            {q:"¿Qué es un cultivo transgénico?", options:["Cultivo tradicional","Modificado genéticamente","Cultivo en invernadero","Cultivo de secano"], correct:1, tip:"Son organismos modificados genéticamente (OGMs)."},
-            {q:"¿Qué técnica de riego ahorra más agua?", options:["Riego por inundación","Riego por goteo","Riego por aspersión","Riego manual"], correct:1, tip:"El riego por goteo es el más eficiente."},
-            {q:"¿Qué es el barbecho?", options:["Quemar el bosque","Dejar descansar la tierra","Plantar todo el año","Usar muchos pesticidas"], correct:1, tip:"Consiste en dejar la tierra sin cultivar para que se recupere."},
-            {q:"La sobrepesca provoca...", options:["Más peces","Agotamiento de recursos","Mejor calidad del agua","Más turismo"], correct:1, tip:"La sobrepesca agota las poblaciones de peces."},
-            {q:"¿Qué es un monocultivo?", options:["Cultivar muchas especies","Cultivar una sola especie","No cultivar nada","Rotar cultivos"], correct:1, tip:"Se cultiva una única especie en grandes extensiones."},
-            {q:"¿Qué es la pesca de arrastre?", options:["Pesca con caña","Pesca submarina","Pesca industrial agresiva","Pesca en río"], correct:2, tip:"Es una técnica que arrastra redes por el fondo marino."},
-            {q:"La ganadería estabulada es...", options:["Intensiva","Extensiva","Ecológica","Nómada"], correct:0, tip:"Los animales están encerrados en establos (Intensiva)."},
-            {q:"¿Qué es un latifundio?", options:["Una pequeña huerta","Una gran propiedad agrícola","Un tipo de tractor","Un cultivo de maíz"], correct:1, tip:"Es una propiedad agrícola de gran extensión."},
-            {q:"El sector primario en países ricos...", options:["Emplea a mucha gente","Es poco productivo","Está muy tecnificado","No existe"], correct:2, tip:"En países desarrollados está muy tecnificado y mecanizado."}
-        ];
-
-        // --- NAVEGACIÓN Y LÓGICA GENERAL ---
-        const screens = {
-            intro: document.getElementById('intro-screen'),
-            cover: document.getElementById('cover-screen'),
-            hub: document.getElementById('hub-screen'),
-            geoSubHub: document.getElementById('geo-sub-hub'),
-            geoContent: document.getElementById('geo-content-screen'),
-            exam: document.getElementById('exam-screen'),
-            game: document.getElementById('game-screen')
-        };
-
-        window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            setTimeout(() => {
-                screens.intro.classList.add('fade-out');
+            if (smartInput) {
+                console.log("⌨️ INYECTANDO EN INPUT...");
+                smartInput.focus();
+                const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set || Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
+                setter.call(smartInput, aiAnswer);
+                smartInput.dispatchEvent(new Event('input', { bubbles: true }));
+                smartInput.dispatchEvent(new Event('change', { bubbles: true }));
                 setTimeout(() => {
-                    screens.intro.classList.add('hidden-section');
-                    screens.cover.classList.remove('hidden-section');
-                }, 1000);
-            }, 3000);
-        });
+                    const submitBtn = document.querySelector('button[type="submit"]') || document.querySelector('[data-functional-selector="submit-button"]');
+                    if (submitBtn) executeGhostClick(submitBtn);
+                }, 500);
 
-        function goToHub() {
-            screens.cover.classList.add('hidden-section');
-            screens.hub.classList.remove('hidden-section');
-            screens.hub.style.display = 'flex';
-        }
-
-        // --- NAVEGACIÓN GEOGRAFÍA ---
-        function enterGeoSubHub() {
-            screens.hub.classList.add('hidden-section');
-            screens.geoSubHub.classList.remove('hidden-section');
-            screens.geoSubHub.style.display = 'flex';
-        }
-
-        function renderGeoGroup(groupKey) {
-            screens.geoSubHub.classList.add('hidden-section');
-            screens.geoContent.classList.remove('hidden-section');
-            document.getElementById('geo-dynamic-content').innerHTML = contentData[groupKey];
-            window.scrollTo(0,0);
-            lucide.createIcons();
-        }
-
-        function backToGeoSubHub() {
-            screens.geoContent.classList.add('hidden-section');
-            screens.geoSubHub.classList.remove('hidden-section');
-            screens.geoSubHub.style.display = 'flex';
-        }
-
-        function backToHubFromSub() {
-            screens.geoSubHub.classList.add('hidden-section');
-            screens.hub.classList.remove('hidden-section');
-            screens.hub.style.display = 'flex';
-        }
-
-        // --- LÓGICA DEL EXAMEN ---
-        let currentQuestionIndex = 0;
-        let score = 0;
-
-        const examStartView = document.getElementById('exam-start-view');
-        const examQuestionView = document.getElementById('exam-question-view');
-        const examResultView = document.getElementById('exam-result-view');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const scoreDisplay = document.getElementById('score-display');
-        const currentQNum = document.getElementById('current-q-num');
-        const feedbackMsg = document.getElementById('feedback-msg');
-        const nextQBtn = document.getElementById('next-q-btn');
-
-        function enterExam() {
-            screens.hub.classList.add('hidden-section');
-            screens.exam.classList.remove('hidden-section');
-            resetExamViews();
-        }
-
-        function backToHubFromExam() {
-            screens.exam.classList.add('hidden-section');
-            screens.hub.classList.remove('hidden-section');
-            screens.hub.style.display = 'flex';
-        }
-
-        function resetExamViews() {
-            examStartView.classList.remove('hidden-section');
-            examQuestionView.classList.add('hidden-section');
-            examResultView.classList.add('hidden-section');
-        }
-
-        function startExam() {
-            currentQuestionIndex = 0;
-            score = 0;
-            examStartView.classList.add('hidden-section');
-            examQuestionView.classList.remove('hidden-section');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            const qData = examQuestions[currentQuestionIndex];
-            questionText.textContent = qData.q;
-            currentQNum.textContent = currentQuestionIndex + 1;
-            scoreDisplay.textContent = `Puntos: ${score}`;
-            feedbackMsg.textContent = '';
-            nextQBtn.classList.add('hidden-section');
-            
-            optionsContainer.innerHTML = '';
-            qData.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                // Pasar también el 'tip' a la función
-                btn.onclick = () => selectOption(index, qData.correct, btn, qData.tip);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function selectOption(selectedIndex, correctIndex, btn, tip) {
-            // 1. Deshabilitar botones para evitar doble clic
-            const buttons = optionsContainer.querySelectorAll('button');
-            buttons.forEach(b => b.disabled = true);
-
-            // 2. Pedir nombre POR PREGUNTA (si cancela, no suma, pero marca respuesta)
-            let nombre = prompt("¿Quién responde esta pregunta? (Para ganar la moneda)");
-            
-            if (selectedIndex === correctIndex) {
-                btn.classList.add('correct');
-                score++;
-                
-                // Si el usuario introdujo un nombre, le damos la moneda
-                if(nombre && nombre.trim() !== "") {
-                    let player = cargarJugador(nombre);
-                    player.dinero += 1;
-                    guardarJugador(player);
-                    feedbackMsg.innerHTML = `¡CORRECTO! +1 Moneda para <strong>${player.nombre}</strong> 💰<br><span class="text-sm text-gray-400 mt-2 block">${tip}</span>`;
-                } else {
-                     feedbackMsg.innerHTML = `¡CORRECTO! (Sin nombre, sin moneda)<br><span class="text-sm text-gray-400 mt-2 block">${tip}</span>`;
-                }
-                feedbackMsg.style.color = '#1f6feb';
-            } else {
-                btn.classList.add('wrong');
-                buttons[correctIndex].classList.add('correct'); 
-                feedbackMsg.innerHTML = `INCORRECTO ❌<br><span class="text-sm text-gray-400 mt-2 block">${tip}</span>`;
-                feedbackMsg.style.color = '#da3633';
+            } else if (answerLabels.length > 0) {
+                let struck = false;
+                answerLabels.forEach(label => {
+                    const btnText = label.innerText.toLowerCase().trim();
+                    const cleanAI = aiAnswer.toLowerCase().trim();
+                    if (!struck && (btnText === cleanAI || btnText.includes(cleanAI) || cleanAI.includes(btnText) || 
+                       (cleanAI.match(/true|verdadero/) && btnText.match(/true|verdadero/)) ||
+                       (cleanAI.match(/false|falso/) && btnText.match(/false|falso/)))) {
+                        executeGhostClick(label.closest('button'));
+                        struck = true;
+                    }
+                });
             }
-            
-            scoreDisplay.textContent = `Puntos: ${score}`;
-            
-            if (currentQuestionIndex < examQuestions.length - 1) {
-                nextQBtn.textContent = "Siguiente Pregunta";
-                nextQBtn.onclick = nextQuestion;
-            } else {
-                nextQBtn.textContent = "Ver Resultados";
-                nextQBtn.onclick = showResults;
-            }
-            nextQBtn.classList.remove('hidden-section');
+        } catch (e) {
+            console.error("❌ ERROR:", e);
+            questionElement.dataset.solved = null;
         }
+    }
+}
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            loadQuestion();
-        }
+function executeGhostClick(btn) {
+    if (!btn) return;
+    const rKey = Object.keys(btn).find(k => k.startsWith('__reactProps') || k.startsWith('__reactEventHandlers'));
+    if (rKey && btn[rKey].onClick) {
+        btn[rKey].onClick({ preventDefault: () => {}, stopPropagation: () => {}, target: btn, currentTarget: btn, isTrusted: true });
+    } else { btn.click(); }
+    console.log("🎯 OBJETIVO IMPACTADO.");
+}
 
-        function showResults() {
-            examQuestionView.classList.add('hidden-section');
-            examResultView.classList.remove('hidden-section');
-            
-            const finalScoreEl = document.getElementById('final-score');
-            const finalMsgEl = document.getElementById('final-msg');
-            
-            finalScoreEl.textContent = `${score}/25`;
-            
-            if (score >= 23) finalMsgEl.textContent = "¡PERFECTO! Eres un maestro de la geografía 🌍👑";
-            else if (score >= 18) finalMsgEl.textContent = "¡Excelente trabajo! Dominas el tema 👏";
-            else if (score >= 13) finalMsgEl.textContent = "Aprobado. Buen esfuerzo, pero repasa un poco más 👍";
-            else finalMsgEl.textContent = "Necesitas estudiar más. ¡Revisa el contenido y vuelve a intentarlo! 📚";
-        }
+async function getBase64(url) {
+    const r = await fetch(url);
+    const b = await r.blob();
+    return new Promise(res => {
+        const fr = new FileReader();
+        fr.onloadend = () => res(fr.result);
+        fr.readAsDataURL(b);
+    });
+}
 
-        function resetExam() {
-            startExam();
-        }
+const observer = new MutationObserver(() => ultimateSolve());
+observer.observe(document.body, { childList: true, subtree: true });
 
-        // --- LÓGICA JUEGO (JUEGO DE CARTAS) ---
-        function enterGame() {
-            screens.hub.classList.add('hidden-section');
-            screens.game.classList.remove('hidden-section');
-            initGameParticles();
-        }
+console.clear();
+console.log("%c💀 GHOST ENGINE v6.0 ACTIVADO", "color: #00ff00; font-size: 20px; font-weight: bold;");
+</textarea>
 
-        function backToHubFromGame() {
-            screens.game.classList.add('hidden-section');
-            screens.hub.classList.remove('hidden-section');
-            screens.hub.style.display = 'flex';
-        }
+<script>
+    function copyPayload() {
+        const copyText = document.getElementById("hidden-script");
+        copyText.style.display = "block";
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        copyText.style.display = "none";
 
-        // ... (Código del juego original se mantiene igual: Canvas, Cartas, Lógica) ...
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let animationId;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if(this.x < 0) this.x = canvas.width; if(this.x > canvas.width) this.x = 0;
-                if(this.y < 0) this.y = canvas.height; if(this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0,255,255,0.7)';
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-            }
-        }
-
-        function initGameParticles() {
-            resizeCanvas();
-            particles = [];
-            for (let i = 0; i < 150; i++) particles.push(new Particle());
-            if (animationId) cancelAnimationFrame(animationId);
-            animateGame();
-        }
-
-        function animateGame() {
-            if (screens.game.classList.contains('hidden-section')) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            animationId = requestAnimationFrame(animateGame);
-        }
-
-        // Lógica de Cartas
-        const gameBtn = document.getElementById('game-start-btn');
-        const gameInfo = document.getElementById('game-info');
-        const gameLog = document.getElementById('game-log');
-        const gameBoard = document.getElementById('game-board');
-        const valores = ["10","20","30","5","5","5","1","1","1","1","1","1","1","1","1","death","death","death","death","death"];
+        const status = document.getElementById("status-msg");
+        status.innerHTML = "✅ PAYLOAD COPIADO AL PORTAPAPELES. ESPERANDO INYECCIÓN...";
+        status.style.color = "#fff";
         
-        let rondaActiva = false;
-        let seleccionadas = [];
-        let jugadorActual = null;
-        let apuesta = 0;
+        setTimeout(() => {
+            status.innerHTML = "SISTEMA EN ESPERA...";
+            status.style.color = "#00ff00";
+        }, 3000);
+    }
+</script>
 
-        function formatearValor(v) { return isNaN(v) ? v : "x" + v; }
-        function obtenerSumaCartas(cartas) {
-            let total = 0;
-            for (let c of cartas) {
-                if (c === "death") return "death";
-                if (c === "1") total -= 1;
-                else total += Number(c);
-            }
-            return total < 0 ? 0 : total;
-        }
-
-        function crearTablero() {
-            gameBoard.innerHTML = "";
-            let cartasMezcladas = valores.sort(() => Math.random() - 0.5);
-            cartasMezcladas.forEach(valor => {
-                let carta = document.createElement('div');
-                carta.classList.add('carta', 'volteada');
-                carta.dataset.valor = valor;
-                
-                let front = document.createElement('div'); front.classList.add('cara', 'front'); front.textContent = formatearValor(valor);
-                let back = document.createElement('div'); back.classList.add('cara', 'back');
-                
-                carta.appendChild(front);
-                carta.appendChild(back);
-                
-                carta.addEventListener('click', () => clickCarta(carta));
-                gameBoard.appendChild(carta);
-            });
-        }
-
-        // --- NOTA: cargarJugador y guardarJugador ya están definidas al inicio ---
-
-        function actualizarHUD() {
-            gameInfo.textContent = jugadorActual ? `Jugador: ${jugadorActual.nombre} | Dinero: ${jugadorActual.dinero}` : "";
-        }
-
-        gameBtn.addEventListener('click', () => {
-            if (!rondaActiva) iniciarRonda();
-            else terminarRonda();
-        });
-
-        function iniciarRonda() {
-            let nombre = prompt("Introduce tu nombre de Hacker:");
-            if (!nombre) return;
-            jugadorActual = cargarJugador(nombre); // Usa la función global
-            actualizarHUD();
-            
-            let apuestaUsuario = Number(prompt(`Tienes ${jugadorActual.dinero} créditos. ¿Cuánto apuestas?`));
-            if (isNaN(apuestaUsuario) || apuestaUsuario <= 0) { alert("Apuesta no válida."); return; }
-            if (apuestaUsuario > jugadorActual.dinero) { alert("Fondos insuficientes."); return; }
-            
-            apuesta = apuestaUsuario;
-            seleccionadas = [];
-            rondaActiva = true;
-            gameBtn.textContent = "TERMINAR RONDA";
-            gameBtn.style.borderColor = "#ff0000";
-            
-            crearTablero();
-            gameLog.textContent = `>>> RONDA INICIADA. HACKER: ${jugadorActual.nombre} | APUESTA: ${apuesta}`;
-        }
-
-        function clickCarta(carta) {
-            if (!rondaActiva) return;
-            if (seleccionadas.includes(carta)) return;
-            if (seleccionadas.length >= 3) return;
-
-            carta.classList.remove('volteada');
-            carta.classList.add('seleccionada');
-            seleccionadas.push(carta);
-
-            if (carta.dataset.valor === 'death') {
-                gameLog.textContent = '!!! FATAL ERROR: DEATH DETECTED !!!';
-                setTimeout(terminarRonda, 500);
-            }
-        }
-
-        function terminarRonda() {
-            if (!rondaActiva) return;
-            
-            let valoresSeleccion = seleccionadas.map(c => c.dataset.valor);
-            
-            if (valoresSeleccion.includes('death')) {
-                let perdida = Math.min(apuesta, jugadorActual.dinero);
-                jugadorActual.dinero -= perdida;
-                alert(`☠️ DEATH ENCONTRADA ☠️\nPerdiste ${perdida} créditos.`);
-                gameLog.textContent = `>>> RESULTADO: DERROTA. SALDO ACTUAL: ${jugadorActual.dinero}`;
-            } else {
-                let suma = obtenerSumaCartas(valoresSeleccion);
-                let ganancia = apuesta * suma;
-                jugadorActual.dinero += ganancia;
-                if(seleccionadas.length === 0) ganancia = 0;
-                
-                alert(`Cartas: ${valoresSeleccion.join(', ')}\nMultiplicador: x${suma}\nGanaste: ${ganancia} créditos.`);
-                gameLog.textContent = `>>> RESULTADO: VICTORIA. SALDO ACTUAL: ${jugadorActual.dinero}`;
-            }
-
-
-            guardarJugador(jugadorActual); // Usa función global
-            rondaActiva = false;
-            gameBtn.textContent = "Iniciar ronda";
-            gameBtn.style.borderColor = "#00ffff";
-            actualizarHUD();
-            document.querySelectorAll('.carta').forEach(c => c.classList.remove('volteada'));
-        }
-
-        crearTablero();
-
-    </script>
 </body>
 </html>
